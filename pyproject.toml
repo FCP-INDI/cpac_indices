@@ -17,7 +17,7 @@
 [project]
 name = "cpac_indices"
 version = "0.1.0"
-description = "A project for sorting and managing C-PAC node indices."
+description = "Sort C-PAC working directory subdirectories by index."
 authors = [
     { name = "Child Mind Institute C-PAC Team", email = "CMI_CPAC@childmind.org"},
     { name = "Jon Cluce", email = "jon.clucas@childmind.org" }
