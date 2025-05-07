@@ -21,9 +21,10 @@ import argparse
 import os
 from pathlib import Path
 import re
-from typing import Optional
+from typing import cast, Optional, TypeAlias
 
 _PATTERN = r"(_\d+)(?=(?:_\d+)*$)"
+IndexType: TypeAlias = Optional[int | tuple[int, int]]
 
 
 def _coerce_to_path(path: Path | str) -> Path:
@@ -38,15 +39,15 @@ def _drop_underscore(index: str) -> int:
     return int(index.lstrip("_"))
 
 
-def grab_index(path: Path | str) -> tuple[Optional[int | tuple[int, int]], Path]:
+def grab_index(path: Path | str) -> tuple["Index", Path]:
     """Grab the index from a filepath."""
     path = _coerce_to_path(path)
-    index = None
+    index: IndexType = None
     filename = path.stem
     matches = re.findall(_PATTERN, filename)
     if matches:
         if len(matches) == 2:  # noqa: PLR2004
-            index = tuple(_drop_underscore(match) for match in matches)
+            index = cast(IndexType, tuple(_drop_underscore(match) for match in matches))
         if len(matches) == 1:
             index = _drop_underscore(matches[0])
     return Index(index), path
@@ -69,8 +70,10 @@ class Index:
             return ".".join(f"{i}" for i in self.index)
         return f"{self.index}"
 
-    def __eq__(self, other: "Index") -> bool:
+    def __eq__(self, other: object) -> bool:
         """Compare two Index instances for equality."""
+        if not isinstance(other, Index):
+            return False
         return self.index == other.index
 
     def __gt__(self, other: "Index") -> bool:
@@ -85,6 +88,7 @@ class Index:
             return self.index[0] >= other.index
         if isinstance(self.index, int) and isinstance(other.index, tuple):
             return self.index > other.index[0]
+        assert isinstance(self.index, int) and isinstance(other.index, int)
         return self.index > other.index
 
     def __lt__(self, other: "Index") -> bool:
@@ -99,6 +103,7 @@ class Index:
             return self.index[0] < other.index
         if isinstance(self.index, int) and isinstance(other.index, tuple):
             return self.index <= other.index[0]
+        assert isinstance(self.index, int) and isinstance(other.index, int)
         return self.index < other.index
 
 
@@ -111,7 +116,7 @@ def gather_subdirectories(wd: Path | str) -> list[Path]:
     return paths
 
 
-def main():
+def main() -> None:
     """Sort nodes from commandline."""
     parser = argparse.ArgumentParser(description="Sort nodes in a directory.")
     parser.add_argument("directory", type=str, help="Directory to sort nodes in.")
