@@ -115,11 +115,21 @@ def main():
     """Sort nodes from commandline."""
     parser = argparse.ArgumentParser(description="Sort nodes in a directory.")
     parser.add_argument("directory", type=str, help="Directory to sort nodes in.")
+    parser.add_argument(
+        "--output",
+        type=str,
+        help="Output file to write sorted nodes to.",
+        required=False,
+    )
     args = parser.parse_args()
 
     sorted_paths = gather_subdirectories(args.directory)
+    file = Path(args.output).open("w") if args.output else None
     for path in sorted_paths:
-        print(path.stem)  # noqa: T201
+        print(path.stem, file=file)
+    if file:
+        file.close()
+        print(f"Sorted nodes written to: {args.output}")  # noqa: T201
 
 
 if __name__ == "__main__":
