@@ -107,13 +107,15 @@ class Index:
         return self.index < other.index
 
 
-def gather_subdirectories(wd: Path | str) -> list[Path]:
+def gather_subdirectories(wd: Path | str) -> list[str]:
     """Gather and sort subdirectories in the given working directory."""
-    paths = []
-    for root, dirs, _ in os.walk(wd):
-        paths.extend([Path(root) / _d for _d in dirs if re.search(_PATTERN, _d)])
-    paths.sort(key=grab_index)
-    return paths
+    paths = {
+        (Path(root) / _d).stem
+        for root, dirs, _ in os.walk(wd)
+        for _d in dirs
+        if re.search(_PATTERN, _d)
+    }
+    return sorted(paths, key=grab_index)
 
 
 def main() -> None:
@@ -131,7 +133,7 @@ def main() -> None:
     sorted_paths = gather_subdirectories(args.directory)
     file = Path(args.output).open("w") if args.output else None
     for path in sorted_paths:
-        print(path.stem, file=file)
+        print(path, file=file)
     if file:
         file.close()
         print(f"Sorted nodes written to: {args.output}")  # noqa: T201

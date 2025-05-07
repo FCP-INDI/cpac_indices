@@ -40,6 +40,18 @@ requires-python = ">=3.10"
 [project.scripts]
 cpac-indices = "sort_nodes:main"
 
+[dependency-groups]
+lint = [
+    "mypy>=1.15.0",
+    "pre-commit>=4.2.0",
+    "ruff>=0.11.8",
+]
+packaging = [
+    "build>=1.2.2.post1",
+    "pip>=25.1.1",
+    "twine>=6.1.0",
+]
+
 [tool.ruff]
 target-version = "py311"
 
@@ -69,16 +81,3 @@ max-args = 10
 max-branches = 50
 max-returns = 12
 max-statements = 100
-
-[dependency-groups]
-lint = [
-    "mypy>=1.15.0",
-    "pre-commit>=4.2.0",
-    "ruff>=0.11.8",
-]
-packaging = [
-    "build>=1.2.2.post1",
-    "pip>=25.1.1",
-    "twine>=6.1.0",
-]
-
